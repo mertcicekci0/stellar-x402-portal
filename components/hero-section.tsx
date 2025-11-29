@@ -10,8 +10,8 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-screen bg-white overflow-visible">
-      {/* Video Background - Centered, Bottom Cropped, Masked */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-[40%] w-full max-w-4xl h-[90vh] z-10 pointer-events-none">
+      {/* Video Background - Right Side, Vertically Centered, Masked, Huge */}
+      <div className="absolute top-1/2 right-[-35%] transform -translate-y-1/2 w-[100vw] max-w-none h-[150vh] z-10 pointer-events-none">
         <video
           autoPlay
           loop
