@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ExternalLink, Search, Menu } from "lucide-react"
@@ -13,31 +14,23 @@ const navSections = [
     items: [
       { name: "Welcome", href: "/docs", external: false },
       { name: "x402 Landing Page", href: "/", external: false },
-      { name: "GitBook Repo", href: "https://github.com/402-labs/x402", external: true },
+      { name: "Open Source Github Repository", href: "https://github.com/mertkaradayi/stellar-x402", external: true },
     ],
   },
   {
     title: "GETTING STARTED",
     items: [
-      { name: "Quickstart for Buyers", href: "/docs/getting-started/buyers", external: false },
-      { name: "Quickstart for Sellers", href: "/docs/getting-started/sellers", external: false },
+      { name: "Installation & Usage", href: "/docs/getting-started", external: false },
     ],
   },
   {
     title: "CORE CONCEPTS",
     items: [
-      { name: "HTTP 402", href: "/docs/core-concepts/http-402", external: false },
-      { name: "Client / Server", href: "/docs/core-concepts/client-server", external: false },
+      { name: "x402 Stellar", href: "/docs/core-concepts/x402-stellar", external: false },
+      { name: "x402 Stellar Client", href: "/docs/core-concepts/x402-stellar-client", external: false },
+      { name: "x402 Stellar Fetch", href: "/docs/core-concepts/x402-stellar-fetch", external: false },
+      { name: "x402 Stellar Express", href: "/docs/core-concepts/x402-stellar-express", external: false },
       { name: "Facilitator", href: "/docs/core-concepts/facilitator", external: false },
-      { name: "Wallet", href: "/docs/core-concepts/wallet", external: false },
-      { name: "Bazaar (Discovery Layer)", href: "/docs/core-concepts/bazaar", external: false },
-      { name: "Network & Token Support", href: "/docs/core-concepts/network-token-support", external: false },
-    ],
-  },
-  {
-    title: "GUIDES",
-    items: [
-      { name: "MCP Server with x402", href: "/docs/guides/mcp-server", external: false },
     ],
   },
 ]
@@ -57,7 +50,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 <Menu className="h-6 w-6" />
               </button>
               <Link href="/docs" className="flex items-center gap-2">
-                <span className="font-bold text-xl tracking-tight">x402 Docs</span>
+                <div className="relative w-32 h-10">
+                  <Image
+                    src="/logo.png"
+                    alt="x402 Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             </div>
             
@@ -72,12 +72,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               </div>
             </div>
 
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-black">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-black">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
