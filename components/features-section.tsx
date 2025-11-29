@@ -83,14 +83,14 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
                 }}
               />
               
-              {/* Enhanced glow around icon area */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#D4A853]/10 rounded-full blur-3xl opacity-70" />
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#D4A853]/15 rounded-full blur-2xl opacity-60" />
+              {/* Enhanced glow around icon area - Ultra Soft */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-64 h-64 bg-slate-200/30 rounded-full blur-3xl opacity-50" />
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-48 h-48 bg-sky-100/40 rounded-full blur-2xl opacity-40" />
               
               {/* Icon container - much larger with animation */}
-              <div className="relative flex items-center justify-center mb-8 h-40 sm:h-48">
+              <div className="relative flex items-center justify-center mb-8 h-56 sm:h-64">
                 <div
-                  className={`relative w-40 h-40 sm:w-48 sm:h-48 drop-shadow-[0_0_40px_rgba(212,168,83,1)] drop-shadow-[0_0_80px_rgba(212,168,83,0.6)] transition-all duration-500 ease-out group-hover:scale-125 group-hover:drop-shadow-[0_0_80px_rgba(212,168,83,1.5)] group-hover:drop-shadow-[0_0_120px_rgba(212,168,83,1)] ${
+                  className={`relative w-56 h-56 sm:w-64 sm:h-64 drop-shadow-[0_0_20px_rgba(0,0,0,0.05)] transition-all duration-500 ease-out group-hover:scale-105 group-hover:drop-shadow-[0_0_30px_rgba(0,0,0,0.08)] ${
                     isVisible
                       ? "opacity-100 scale-100 rotate-0 animate-pulse-slow"
                       : "opacity-0 scale-75 rotate-12"
@@ -102,9 +102,9 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
                   <Image
                     src={feature.icon}
                     alt={feature.title}
-                    width={192}
-                    height={192}
-                    className="object-contain w-full h-full transition-transform duration-500 ease-out group-hover:scale-110"
+                    width={256}
+                    height={256}
+                    className="object-contain w-full h-full transition-transform duration-500 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
                     priority
                   />
                 </div>
@@ -121,7 +121,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
                   transitionDelay: `${index * 150 + 400}ms`,
                 }}
               >
-                <span className="text-xs font-bold tracking-[0.15em] text-[#D4A853] uppercase">
+                <span className="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">
                   {feature.category}
                 </span>
               </div>
