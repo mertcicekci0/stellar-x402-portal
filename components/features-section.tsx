@@ -191,30 +191,15 @@ export function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={titleRef}
-          className={`text-center mb-6 sm:mb-8 transition-all duration-700 ${
+          className={`text-center mb-20 transition-all duration-700 ${
             titleVisible
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-8 scale-95"
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="relative inline-block group cursor-pointer">
-            <div
-              className={`relative transition-all duration-500 ease-out group-hover:scale-110 group-hover:drop-shadow-[0_0_40px_rgba(212,168,83,0.8)] ${
-                titleVisible
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-90"
-              }`}
-            >
-              <Image
-                src="/whyx402.png"
-                alt="Why @402-stellar?"
-                width={600}
-                height={150}
-                className="object-contain w-full h-auto max-w-3xl mx-auto"
-                priority
-              />
-            </div>
-          </div>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-tight text-black">
+            Why @402-stellar?
+          </h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
