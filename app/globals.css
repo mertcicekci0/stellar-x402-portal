@@ -159,3 +159,19 @@ html {
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
+
+/* Slow pulse animation for icons */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}

@@ -12,12 +12,6 @@ export function LogoMarquee() {
 
   return (
     <section className="py-12 border-y border-border/50 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <p className="text-center text-sm text-muted-foreground">
-          Trusted by leading institutions in the Stellar ecosystem
-        </p>
-      </div>
-
       <div className="relative">
         <div className="flex animate-marquee">
           {[...logos, ...logos].map((logo, index) => (
