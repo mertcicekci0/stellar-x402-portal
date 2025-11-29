@@ -57,7 +57,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
   return (
     <div
       ref={cardRef}
-      className={`group relative p-12 sm:p-14 rounded-2xl bg-[#0a0e14] border border-white/5 hover:border-white/10 transition-all duration-500 overflow-hidden ${
+      className={`group relative p-12 sm:p-14 rounded-2xl bg-white border border-black/10 hover:border-black/20 transition-all duration-500 overflow-hidden ${
         isVisible
           ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-12"
@@ -74,8 +74,8 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
                     90deg,
                     transparent,
                     transparent 3px,
-                    rgba(255, 255, 255, 0.08) 3px,
-                    rgba(255, 255, 255, 0.08) 6px
+                    rgba(0, 0, 0, 0.05) 3px,
+                    rgba(0, 0, 0, 0.05) 6px
                   )`,
                   maskImage: 'radial-gradient(ellipse 80% 60% at center, black 30%, transparent 80%)',
                   WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at center, black 30%, transparent 80%)',
@@ -128,7 +128,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
               
               {/* Title */}
               <h3
-                className={`text-2xl sm:text-3xl font-bold mb-5 text-center text-white transition-all duration-700 ${
+                className={`text-2xl sm:text-3xl font-bold mb-5 text-center text-black transition-all duration-700 ${
                   isVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-4"
@@ -142,7 +142,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
               
               {/* Description */}
               <p
-                className={`text-white/60 leading-relaxed text-center text-sm max-w-sm mx-auto transition-all duration-700 ${
+                className={`text-gray-600 leading-relaxed text-center text-sm max-w-sm mx-auto transition-all duration-700 ${
                   isVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-4"
@@ -187,7 +187,7 @@ export function FeaturesSection() {
   }, [])
 
   return (
-    <section id="features" className="py-24 bg-stellar-navy text-white relative overflow-hidden">
+    <section id="features" className="py-24 bg-white text-black relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={titleRef}
