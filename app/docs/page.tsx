@@ -89,8 +89,8 @@ export default function DocsPage() {
         <div className="mb-12 p-4 rounded-lg border border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-600 mb-2">
             <strong className="text-black">Want to contribute to our docs?</strong> The{" "}
-            <a href="https://github.com/402-labs/x402" target="_blank" rel="noopener noreferrer" className="text-black hover:underline inline-flex items-center gap-1">
-              GitBook repo
+            <a href="https://github.com/mertkaradayi/stellar-x402" target="_blank" rel="noopener noreferrer" className="text-black hover:underline inline-flex items-center gap-1">
+              Open Source Github Repository
               <ExternalLink className="h-3 w-3" />
             </a>{" "}
             is open to PRs! Our only ask is that you keep these docs as a neutral resource, with no branded content other than linking out to other resources where appropriate.
