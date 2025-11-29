@@ -45,12 +45,12 @@ export function TerminalSection() {
               : "opacity-0 translate-y-12"
           }`}
         >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-tight text-black mb-6">
               Get Started
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Install @402-stellar and start building internet-native payments
+            <p className="text-lg sm:text-xl font-light text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              Install <span className="text-black font-normal">@402-stellar</span> and start building internet-native payments
             </p>
           </div>
 
@@ -64,5 +64,3 @@ export function TerminalSection() {
     </section>
   )
 }
-
-
