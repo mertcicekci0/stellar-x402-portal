@@ -39,9 +39,7 @@ export function HeroSection() {
 
             {/* Main Headline - Base.org style */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-black leading-tight tracking-tight">
-              <span className="block">An open protocol</span>
-              <span className="block">for internet-native</span>
-              <span className="block">payments</span>
+              <span className="block">Stellar x402</span>
             </h1>
 
             {/* Subheadline */}
