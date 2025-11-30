@@ -1,34 +1,56 @@
 import { notFound } from "next/navigation"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { FAQSection } from "@/components/faq-section"
 
 const docsContent: Record<string, { title: string; content: React.ReactNode }> = {
+  "faq": {
+    title: "Frequently Asked Questions",
+    content: <FAQSection />,
+  },
   "getting-started": {
     title: "Getting Started",
     content: (
       <div className="space-y-8">
-        <p>
-          Welcome to the Stellar x402 ecosystem. This guide will help you get started with building x402-enabled applications on Stellar.
+        <p className="text-lg text-gray-600">
+          Get up and running with Stellar x402 in minutes. Whether you're building a wallet, dApp, or monetizing an API, we have you covered.
         </p>
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">For Wallet/dApp Developers (Pay for APIs)</h2>
           <div className="space-y-4">
-            <p>If you want to consume x402-protected APIs:</p>
+            <p className="text-gray-600">Install the fetch wrapper to automatically handle payments:</p>
             <div className="rounded-lg overflow-hidden border border-gray-200">
               <SyntaxHighlighter language="bash" style={prism}>
-                {`npm install x402-stellar-fetch`}
+                {`npm install x402-stellar-fetch @stellar/stellar-sdk`}
               </SyntaxHighlighter>
             </div>
+
+            <h3 className="text-xl font-semibold text-black mt-6 mb-2">With Keypair (Backend/Scripts)</h3>
             <div className="rounded-lg overflow-hidden border border-gray-200">
               <SyntaxHighlighter language="typescript" style={prism}>
-                {`import { wrapFetchWithPayment } from "x402-stellar-fetch";
+                {`import { wrapFetchWithPayment, createKeypairSigner } from "x402-stellar-fetch";
 import { Keypair } from "@stellar/stellar-sdk";
 
 const keypair = Keypair.fromSecret("SXXX...");
-const fetchWithPay = wrapFetchWithPayment(fetch, { type: "keypair", keypair });
+const signer = createKeypairSigner(keypair);
+const fetchWithPay = wrapFetchWithPayment(fetch, signer);
 
 // Automatically handles 402 Payment Required responses
+const response = await fetchWithPay("https://api.example.com/premium");
+const data = await response.json();`}
+              </SyntaxHighlighter>
+            </div>
+
+            <h3 className="text-xl font-semibold text-black mt-6 mb-2">With Freighter (Browser)</h3>
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              <SyntaxHighlighter language="typescript" style={prism}>
+                {`import { wrapFetchWithPayment, createFreighterSigner } from "x402-stellar-fetch";
+
+const signer = createFreighterSigner();
+const fetchWithPay = wrapFetchWithPayment(fetch, signer);
+
+// Freighter will prompt user to approve payment
 const response = await fetchWithPay("https://api.example.com/premium");`}
               </SyntaxHighlighter>
             </div>
@@ -38,10 +60,10 @@ const response = await fetchWithPay("https://api.example.com/premium");`}
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">For API Developers (Charge for APIs)</h2>
           <div className="space-y-4">
-            <p>If you want to monetize your API endpoints:</p>
+            <p className="text-gray-600">Install the Express middleware to monetize your routes:</p>
             <div className="rounded-lg overflow-hidden border border-gray-200">
               <SyntaxHighlighter language="bash" style={prism}>
-                {`npm install x402-stellar-express`}
+                {`npm install x402-stellar-express express`}
               </SyntaxHighlighter>
             </div>
             <div className="rounded-lg overflow-hidden border border-gray-200">
@@ -51,19 +73,285 @@ import { paymentMiddleware } from "x402-stellar-express";
 
 const app = express();
 
-app.use(paymentMiddleware(
-  "GXXXX...",  // Your Stellar address to receive payments
-  {
+// Protect routes with payments - that's it!
+app.use(paymentMiddleware({
+  payTo: "GXXXX...",  // Your Stellar address to receive payments
+  routes: {
     "/api/premium/*": { price: "1.00" }  // 1 XLM
   },
-  { url: "http://localhost:4022" }  // Facilitator URL
-));
+  facilitator: { url: "http://localhost:4022" },
+  // Optional: Enable browser-friendly paywall UI
+  paywall: { appName: "My API" },
+}));
 
 app.get("/api/premium/data", (req, res) => {
   res.json({ premium: "content" });
-});`}
+});
+
+app.listen(3000);`}
               </SyntaxHighlighter>
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">Architecture</h2>
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 overflow-x-auto">
+            <pre className="text-sm font-mono leading-relaxed">
+{`┌─────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│   CLIENT    │         │ RESOURCE SERVER │         │   FACILITATOR   │
+│  (Wallet)   │         │   (API Owner)   │         │                 │
+└──────┬──────┘         └────────┬────────┘         └────────┬────────┘
+       │                         │                           │
+       │ 1. Request              │                           │
+       ├────────────────────────>│                           │
+       │                         │                           │
+       │ 2. 402 Payment Required │                           │
+       │<────────────────────────┤                           │
+       │                         │                           │
+       │ 3. Sign payment (XDR)   │                           │
+       │    with Freighter/      │                           │
+       │    Keypair              │                           │
+       │                         │                           │
+       │ 4. Request + X-PAYMENT  │                           │
+       ├────────────────────────>│                           │
+       │                         │                           │
+       │                         │ 5. Verify payment         │
+       │                         ├──────────────────────────>│
+       │                         │                           │
+       │                         │ 6. Verification result    │
+       │                         │<──────────────────────────┤
+       │                         │                           │
+       │                         │ 7. Serve content          │
+       │                         │                           │
+       │                         │ 8. Settle payment         │
+       │                         ├──────────────────────────>│
+       │                         │                           │
+       │                         │ 9. Submit to Stellar      │
+       │                         │    (with optional         │
+       │                         │     fee-bump)             │
+       │                         │                           │
+       │                         │ 10. Settlement result     │
+       │                         │<──────────────────────────┤
+       │                         │                           │
+       │ 11. 200 OK + Content    │                           │
+       │     + X-PAYMENT-RESPONSE│                           │
+       │<────────────────────────┤                           │
+       │                         │                           │`}
+            </pre>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">Development</h2>
+          <h3 className="text-xl font-semibold text-black mb-2">Prerequisites</h3>
+          <ul className="list-disc pl-6 mb-4 text-gray-600">
+            <li>Node.js v18 or higher</li>
+            <li>pnpm v8 or higher</li>
+            <li>Stellar testnet account (fund via <a href="https://friendbot.stellar.org" className="text-blue-600 hover:underline">friendbot</a>)</li>
+          </ul>
+
+          <h3 className="text-xl font-semibold text-black mb-2">Setup</h3>
+          <div className="rounded-lg overflow-hidden border border-gray-200">
+            <SyntaxHighlighter language="bash" style={prism}>
+              {`# Clone the repository
+git clone https://github.com/your-org/stellar-x402.git
+cd stellar-x402
+
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test`}
+            </SyntaxHighlighter>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">Testing</h2>
+          <p className="text-gray-600">
+            See <a href="https://github.com/mertkaradayi/stellar-x402/blob/main/TESTING.md" className="text-blue-600 hover:underline">TESTING.md</a> for comprehensive testing guide.
+          </p>
+        </section>
+      </div>
+    ),
+  },
+  "protocol/comparison": {
+    title: "Protocol Format Comparison",
+    content: (
+      <div className="space-y-8">
+        <p className="text-lg text-gray-600">
+          A detailed look at the actual JSON structures used in Stellar x402 vs the base x402 protocol (EVM). This helps you understand the differences at a glance.
+        </p>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">1. Payment Required Response (402 Response)</h2>
+          <p className="text-gray-600 mb-4">When a server requires payment, it returns a <code>402 Payment Required</code> status.</p>
+          
+          <div className="grid xl:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-black mb-2">Base x402 Format (EVM Example)</h3>
+              <div className="rounded-lg overflow-hidden border border-gray-200">
+                <SyntaxHighlighter language="json" style={prism}>
+                  {`{
+  "x402Version": 1,
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "base-sepolia",
+      "maxAmountRequired": "1000000",
+      "resource": "https://api.example.com/premium",
+      "payTo": "0x2096...12287C",
+      "asset": "0x036C...3dCF7e"
+    }
+  ]
+}`}
+                </SyntaxHighlighter>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-black mb-2">Stellar x402 Format</h3>
+              <div className="rounded-lg overflow-hidden border border-gray-200">
+                <SyntaxHighlighter language="json" style={prism}>
+                  {`{
+  "x402Version": 1,
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "stellar-testnet",
+      "maxAmountRequired": "10000000", // 1 XLM
+      "resource": "https://api.example.com/premium",
+      "payTo": "GC63P...W5BSIRT",
+      "asset": "native", // Native XLM
+      "extra": {
+        "feeSponsorship": true
+      }
+    }
+  ]
+}`}
+                </SyntaxHighlighter>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+             <h4 className="font-semibold text-blue-900 mb-2">Key Differences</h4>
+             <ul className="list-disc pl-5 text-sm text-blue-800 space-y-1">
+               <li><code>network</code>: "stellar-testnet" vs "base-sepolia"</li>
+               <li><code>asset</code>: "native" for XLM vs ERC-20 address</li>
+               <li><code>maxAmountRequired</code>: Stroops (7 decimals) vs wei/token units</li>
+               <li><code>payTo</code>: Stellar address (G...) vs EVM address (0x...)</li>
+             </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">2. Payment Payload (X-PAYMENT Header)</h2>
+          <p className="text-gray-600 mb-4">The client sends this as the <code>X-PAYMENT</code> header (base64-encoded JSON).</p>
+
+          <div className="grid xl:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-semibold text-black mb-2">Base x402 (Signature-based)</h3>
+              <div className="rounded-lg overflow-hidden border border-gray-200">
+                <SyntaxHighlighter language="json" style={prism}>
+                  {`{
+  "payload": {
+    "signature": "0x2d6a...",
+    "authorization": {
+      "from": "0x857b...",
+      "to": "0x2096...",
+      "value": "1000000",
+      "validBefore": "1740672154",
+      "nonce": "0xf374..."
+    }
+  }
+}`}
+                </SyntaxHighlighter>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-black mb-2">Stellar x402 (XDR-based)</h3>
+              <div className="rounded-lg overflow-hidden border border-gray-200">
+                <SyntaxHighlighter language="json" style={prism}>
+                  {`{
+  "payload": {
+    "signedTxXdr": "AAAAAg...", // Complete signed tx
+    "sourceAccount": "GABC...",
+    "destination": "GC63...",
+    "amount": "10000000",
+    "asset": "native",
+    "validUntilLedger": 12345678,
+    "nonce": "550e84..."
+  }
+}`}
+                </SyntaxHighlighter>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h3 className="font-semibold text-black mb-2">Why XDR?</h3>
+            <ul className="list-disc pl-6 text-gray-600 space-y-1">
+              <li>Stellar uses XDR (eXternal Data Representation) for all transactions</li>
+              <li>The <code>signedTxXdr</code> contains the complete, signed transaction ready for submission</li>
+              <li>Facilitator can optionally fee-bump without modifying the client's transaction</li>
+              <li>Built-in replay protection via Stellar's sequence numbers</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">3. Facilitator Verify Request</h2>
+          <div className="rounded-lg overflow-hidden border border-gray-200 mb-4">
+            <SyntaxHighlighter language="json" style={prism}>
+              {`// Stellar x402 Format (Compatible, with flexibility)
+{
+  "x402Version": 1,
+  "paymentPayload": { /* PaymentPayload object */ },  // OR
+  "paymentHeader": "base64-encoded-payment-header",   // Alternative format
+  "paymentRequirements": { /* PaymentRequirements object */ }
+}`}
+            </SyntaxHighlighter>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-black mb-4">Summary of Format Differences</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aspect</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EVM (Coinbase)</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stellar (Ours)</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200 text-sm">
+                <tr>
+                  <td className="px-6 py-4 font-medium">Payment Structure</td>
+                  <td className="px-6 py-4 text-gray-500">Signature + authorization object</td>
+                  <td className="px-6 py-4 text-black font-medium">Complete signed XDR transaction</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 font-medium">Expiry</td>
+                  <td className="px-6 py-4 text-gray-500">Unix timestamp (validBefore)</td>
+                  <td className="px-6 py-4 text-black font-medium">Ledger sequence (validUntilLedger)</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 font-medium">Native Asset</td>
+                  <td className="px-6 py-4 text-gray-500">Requires ERC-20 contract</td>
+                  <td className="px-6 py-4 text-black font-medium">"native" (no contract)</td>
+                </tr>
+                 <tr>
+                  <td className="px-6 py-4 font-medium">Replay Protection</td>
+                  <td className="px-6 py-4 text-gray-500">Nonce in authorization</td>
+                  <td className="px-6 py-4 text-black font-medium">Sequence numbers (protocol-level)</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </div>
@@ -73,7 +361,7 @@ app.get("/api/premium/data", (req, res) => {
     title: "x402 Stellar",
     content: (
       <div className="space-y-8">
-        <p className="text-lg">Core library for the Stellar x402 payment protocol.</p>
+        <p className="text-lg">Core library with types, schemas, and facilitator client for building custom integrations.</p>
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">Installation</h2>
@@ -158,7 +446,7 @@ console.log(testnetConfig.horizonUrl);
     title: "x402 Stellar Client",
     content: (
       <div className="space-y-8">
-        <p className="text-lg">Client SDK for signing Stellar x402 payments. Supports both Stellar Keypair (for backends/scripts) and Freighter wallet (for browsers).</p>
+        <p className="text-lg">Client SDK for signing payments (Keypair + Freighter).</p>
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">Installation</h2>
@@ -226,67 +514,6 @@ const xPayment = await createPaymentHeader({
 // Freighter will prompt the user to approve the transaction`}
             </SyntaxHighlighter>
           </div>
-
-          <h3 className="text-xl font-semibold text-black mb-3">Selecting Payment Requirements</h3>
-          <p className="mb-2">When you receive a 402 response with multiple payment options:</p>
-          <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`import { selectPaymentRequirements } from "x402-stellar-client";
-
-// From 402 response
-const accepts = response.accepts;
-
-// Select Stellar payment option
-const requirements = selectPaymentRequirements(
-  accepts,
-  "stellar-testnet", // preferred network
-  "exact" // scheme
-);`}
-            </SyntaxHighlighter>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">API</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <h4 className="font-mono font-bold text-lg">createPaymentHeader(options)</h4>
-              <p>Main entry point for creating signed X-PAYMENT headers.</p>
-              <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li><code>signer</code> - The signer to use (keypair or Freighter)</li>
-                <li><code>paymentRequirements</code> - The payment requirements from 402 response</li>
-                <li><code>x402Version</code> - The x402 version (default: 1)</li>
-                <li><code>timeoutSeconds</code> - Optional timeout override</li>
-              </ul>
-              <p className="mt-2">Returns: Base64-encoded payment header string</p>
-            </div>
-
-            <div>
-              <h4 className="font-mono font-bold text-lg">createPaymentPayload(options)</h4>
-              <p>Same as createPaymentHeader but returns the raw PaymentPayload object.</p>
-            </div>
-
-            <div>
-              <h4 className="font-mono font-bold text-lg">createKeypairSigner(keypair)</h4>
-              <p>Create a signer from a Stellar Keypair.</p>
-            </div>
-
-            <div>
-              <h4 className="font-mono font-bold text-lg">createFreighterSigner()</h4>
-              <p>Create a signer that uses the Freighter wallet.</p>
-            </div>
-
-            <div>
-              <h4 className="font-mono font-bold text-lg">selectPaymentRequirements(requirements, network?, scheme?)</h4>
-              <p>Select payment requirements from a list of options.</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">License</h2>
-          <p>MIT</p>
         </section>
       </div>
     ),
@@ -295,7 +522,7 @@ const requirements = selectPaymentRequirements(
     title: "x402 Stellar Fetch",
     content: (
       <div className="space-y-8">
-        <p className="text-lg">Fetch wrapper that automatically handles x402 payments for Stellar.</p>
+        <p className="text-lg">Fetch wrapper that auto-pays 402 responses for simple client integrations.</p>
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">Installation</h2>
@@ -308,116 +535,19 @@ const requirements = selectPaymentRequirements(
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">Usage</h2>
-          
-          <h3 className="text-xl font-semibold text-black mb-3">Basic Example</h3>
           <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
             <SyntaxHighlighter language="typescript" style={prism}>
               {`import { wrapFetchWithPayment, createKeypairSigner } from "x402-stellar-fetch";
 import { Keypair } from "@stellar/stellar-sdk";
 
-// Create a signer
 const keypair = Keypair.fromSecret("SXXX...");
 const signer = createKeypairSigner(keypair);
 
-// Wrap fetch with automatic payment handling
+// Automatically handles 402 Payment Required responses
 const fetchWithPay = wrapFetchWithPayment(fetch, signer);
-
-// Make requests - payments are handled automatically
-const response = await fetchWithPay("https://api.example.com/premium");
-const data = await response.json();`}
-            </SyntaxHighlighter>
-          </div>
-
-          <h3 className="text-xl font-semibold text-black mb-3">With Options</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`const fetchWithPay = wrapFetchWithPayment(fetch, signer, {
-  // Maximum payment amount (in stroops, default: 1 XLM)
-  maxAmount: BigInt(50_000_000), // 5 XLM max
-
-  // Custom requirement selector
-  requirementSelector: (requirements) => {
-    // Custom logic to select from multiple payment options
-    return requirements.find((r) => r.network === "stellar-testnet")!;
-  },
-});`}
-            </SyntaxHighlighter>
-          </div>
-
-          <h3 className="text-xl font-semibold text-black mb-3">With Freighter (Browser)</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`import { wrapFetchWithPayment, createFreighterSigner } from "x402-stellar-fetch";
-
-const signer = createFreighterSigner();
-const fetchWithPay = wrapFetchWithPayment(fetch, signer);
-
-// Freighter will prompt user to approve each payment
 const response = await fetchWithPay("https://api.example.com/premium");`}
             </SyntaxHighlighter>
           </div>
-
-          <h3 className="text-xl font-semibold text-black mb-3">Getting Payment Info</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`import { wrapFetchWithPayment, decodePaymentResponse } from "x402-stellar-fetch";
-
-const fetchWithPay = wrapFetchWithPayment(fetch, signer);
-const response = await fetchWithPay("https://api.example.com/premium");
-
-// Get payment details from response header
-const paymentInfo = decodePaymentResponse(response);
-if (paymentInfo) {
-  console.log(\`Transaction: \${paymentInfo.transaction}\`);
-  console.log(\`Network: \${paymentInfo.network}\`);
-  console.log(\`Payer: \${paymentInfo.payer}\`);
-}`}
-            </SyntaxHighlighter>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">How It Works</h2>
-          <ol className="list-decimal pl-6 space-y-2">
-            <li>Makes the initial request</li>
-            <li>If response is 402 Payment Required:
-              <ul className="list-disc pl-6 mt-1 space-y-1 text-gray-600">
-                <li>Parses accepts array from response body</li>
-                <li>Selects a Stellar-compatible payment option</li>
-                <li>Verifies amount is within maxAmount</li>
-                <li>Creates and signs a payment transaction</li>
-                <li>Retries request with X-PAYMENT header</li>
-              </ul>
-            </li>
-            <li>Returns the final response</li>
-          </ol>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">API</h2>
-          <div className="space-y-6">
-            <div>
-              <h4 className="font-mono font-bold text-lg">wrapFetchWithPayment(fetch, signer, options?)</h4>
-              <p>Wraps fetch to automatically handle 402 responses.</p>
-            </div>
-            <div>
-              <h4 className="font-mono font-bold text-lg">decodePaymentResponse(response)</h4>
-              <p>Decodes the X-PAYMENT-RESPONSE header from a paid request.</p>
-            </div>
-            <div>
-              <h4 className="font-mono font-bold text-lg">createKeypairSigner(keypair)</h4>
-              <p>Create a signer from a Stellar Keypair.</p>
-            </div>
-            <div>
-              <h4 className="font-mono font-bold text-lg">createFreighterSigner()</h4>
-              <p>Create a signer that uses the Freighter wallet.</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">License</h2>
-          <p>MIT</p>
         </section>
       </div>
     ),
@@ -426,7 +556,7 @@ if (paymentInfo) {
     title: "x402 Stellar Express",
     content: (
       <div className="space-y-8">
-        <p className="text-lg">Express middleware for x402 payments on Stellar. Protect your API routes with instant Stellar payments.</p>
+        <p className="text-lg">Express middleware for protecting routes with x402 payments.</p>
 
         <section>
           <h2 className="text-2xl font-bold text-black mb-4">Installation</h2>
@@ -438,7 +568,7 @@ if (paymentInfo) {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-black mb-4">Quick Start</h2>
+          <h2 className="text-2xl font-bold text-black mb-4">Usage</h2>
           <div className="rounded-lg overflow-hidden border border-gray-200">
             <SyntaxHighlighter language="typescript" style={prism}>
               {`import express from "express";
@@ -446,106 +576,17 @@ import { paymentMiddleware } from "x402-stellar-express";
 
 const app = express();
 
-// Protect routes with payments
-app.use(
-  paymentMiddleware({
-    payTo: "GXXXX...", // Your Stellar address
-    routes: {
-      "/api/premium/*": { price: "1.00" }, // 1 XLM
-      "/api/data": { price: "0.50" }, // 0.5 XLM
-    },
-    facilitator: {
-      url: "http://localhost:4022", // Your facilitator URL
-    },
-  })
-);
-
-// Protected routes - payment required!
-app.get("/api/premium/content", (req, res) => {
-  res.json({ premium: "content" });
-});
-
-// Unprotected routes - no payment required
-app.get("/api/free", (req, res) => {
-  res.json({ free: "content" });
-});
+app.use(paymentMiddleware({
+  payTo: "GXXXX...", // Your Stellar address
+  routes: {
+    "/api/premium/*": { price: "1.00" }
+  },
+  facilitator: { url: "http://localhost:4022" }
+}));
 
 app.listen(3000);`}
             </SyntaxHighlighter>
           </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">Configuration</h2>
-          <h3 className="text-xl font-semibold text-black mb-3">Full Configuration</h3>
-          <div className="rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`app.use(
-  paymentMiddleware({
-    // Required: Your Stellar address to receive payments
-    payTo: "GXXXX...",
-
-    // Required: Routes to protect
-    routes: {
-      "/api/premium/*": {
-        price: "1.00", // Amount in XLM (or stroops as number)
-        asset: "native", // "native" for XLM or SAC address
-        description: "Premium API access",
-        mimeType: "application/json",
-        maxTimeoutSeconds: 300,
-      },
-    },
-
-    // Optional: Facilitator configuration
-    facilitator: {
-      url: "http://localhost:4022",
-      createAuthHeaders: async () => ({
-        verify: { Authorization: "Bearer xxx" },
-        settle: { Authorization: "Bearer xxx" },
-        supported: {},
-      }),
-    },
-
-    // Optional: Default network (default: "stellar-testnet")
-    network: "stellar-testnet",
-
-    // Optional: Default asset (default: "native")
-    asset: "native",
-  })
-);`}
-            </SyntaxHighlighter>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">Route Patterns</h2>
-          <p className="mb-2">Supports flexible route matching:</p>
-          <div className="rounded-lg overflow-hidden border border-gray-200">
-            <SyntaxHighlighter language="typescript" style={prism}>
-              {`routes: {
-  // Exact match
-  "/api/data": "1.00",
-
-  // Wildcard (matches /api/premium/*, /api/premium/foo/bar, etc.)
-  "/api/premium/*": "1.00",
-
-  // Parameter syntax (matches /users/123, /users/abc, etc.)
-  "/users/[id]": "0.50",
-
-  // HTTP method specific
-  "GET /api/read": "0.10",
-  "POST /api/write": "0.50",
-
-  // All methods (default)
-  "* /api/any": "1.00",
-}`}
-            </SyntaxHighlighter>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">License</h2>
-          <p>MIT</p>
         </section>
       </div>
     ),
@@ -554,60 +595,28 @@ app.listen(3000);`}
     title: "Facilitator",
     content: (
       <div className="space-y-8">
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-          <h3 className="font-semibold mb-2">Stellar x402 Facilitator - Compliance Status</h3>
-          <ul className="space-y-1 text-sm">
-            <li><strong>Last Updated:</strong> November 29, 2025</li>
-            <li><strong>Status:</strong> ✅ 100% Compliant with x402 Facilitator Specification</li>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h3 className="font-bold text-green-800 mb-2">Protocol Compliance</h3>
+          <p className="text-sm text-green-700 mb-2">
+            This implementation is <strong>100% compliant</strong> with the x402 specification.
+          </p>
+          <ul className="list-disc pl-5 text-sm text-green-700 space-y-1">
+             <li>✅ All facilitator endpoints (/verify, /settle, /supported)</li>
+             <li>✅ Payment payload and requirements schemas</li>
+             <li>✅ Error codes and response formats</li>
+             <li>✅ Replay protection and idempotency</li>
+             <li>✅ Trust-minimized payment flows</li>
           </ul>
         </div>
 
         <section>
-          <h2 className="text-2xl font-bold text-black mb-4">Executive Summary</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead>
-                <tr>
-                  <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Category</th>
-                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Details</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Core Facilitator API</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">/verify, /settle, /supported endpoints</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Zod Validation</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">All schemas match Coinbase x402 patterns</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Error Codes</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Stellar-specific codes following Coinbase naming</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Replay Protection</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Redis-backed with memory fallback</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Idempotency</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Cached settlement results</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">Fee Sponsorship</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-green-600">✅ Complete</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Optional fee-bump support</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-4 font-medium">The Stellar x402 Facilitator is 100% compliant with the Coinbase x402 specification for facilitator implementations.</p>
+          <h2 className="text-2xl font-bold text-black mb-4">Overview</h2>
+          <p className="text-gray-600 mb-4">
+            The facilitator is a server component responsible for verifying and settling payments on behalf of resource servers. It abstracts away blockchain complexity from your API.
+          </p>
+          <p className="text-gray-600">
+            See <a href="https://github.com/mertkaradayi/stellar-x402/tree/main/packages/facilitator" className="text-blue-600 hover:underline">packages/facilitator</a> for the full implementation.
+          </p>
         </section>
 
         <section>
@@ -616,41 +625,7 @@ app.listen(3000);`}
           <div className="space-y-8">
             <div>
               <h3 className="text-xl font-bold text-black mb-2">POST /verify</h3>
-              <p className="mb-4">Verifies a payment is valid before settlement.</p>
-              <h4 className="font-semibold mb-2">Request:</h4>
-              <div className="rounded-lg overflow-hidden border border-gray-200 mb-4">
-                <SyntaxHighlighter language="json" style={prism}>
-                  {`{
-  "x402Version": 1,
-  "paymentPayload": {
-    "x402Version": 1,
-    "scheme": "exact",
-    "network": "stellar-testnet",
-    "payload": {
-      "signedTxXdr": "AAAAAgAAAA...",
-      "sourceAccount": "GXXXX...",
-      "amount": "10000000",
-      "destination": "GXXXX...",
-      "asset": "native",
-      "validUntilLedger": 12345678,
-      "nonce": "unique-nonce-123"
-    }
-  },
-  "paymentRequirements": {
-    "scheme": "exact",
-    "network": "stellar-testnet",
-    "maxAmountRequired": "10000000",
-    "resource": "https://api.example.com/resource",
-    "description": "API access",
-    "mimeType": "application/json",
-    "payTo": "GXXXX...",
-    "maxTimeoutSeconds": 300,
-    "asset": "native"
-  }
-}`}
-                </SyntaxHighlighter>
-              </div>
-              <h4 className="font-semibold mb-2">Response:</h4>
+              <p className="mb-4 text-gray-600">Verifies a payment is valid before settlement. Checks signature, expiry, and balance.</p>
               <div className="rounded-lg overflow-hidden border border-gray-200">
                 <SyntaxHighlighter language="json" style={prism}>
                   {`{
@@ -663,8 +638,7 @@ app.listen(3000);`}
 
             <div>
               <h3 className="text-xl font-bold text-black mb-2">POST /settle</h3>
-              <p className="mb-4">Submits payment to the Stellar network.</p>
-              <h4 className="font-semibold mb-2">Response:</h4>
+              <p className="mb-4 text-gray-600">Submits payment to the Stellar network. Handles fee-bumping if configured.</p>
               <div className="rounded-lg overflow-hidden border border-gray-200">
                 <SyntaxHighlighter language="json" style={prism}>
                   {`{
@@ -675,41 +649,6 @@ app.listen(3000);`}
 }`}
                 </SyntaxHighlighter>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold text-black mb-4">Recommendations</h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold text-black mb-2">Immediate (Before Production)</h3>
-              <ol className="list-decimal pl-6 space-y-2">
-                <li>
-                  <strong>Enable Mainnet Support</strong>
-                  <div className="rounded-lg overflow-hidden border border-gray-200 mt-2">
-                    <SyntaxHighlighter language="typescript" style={prism}>
-                      {`// In types/verify/facilitator.ts
-export const SUPPORTED_KINDS = [
-  { x402Version: 1, scheme: "exact", network: "stellar-testnet" },
-  { x402Version: 1, scheme: "exact", network: "stellar" }, // Uncomment this
-] as const;`}
-                    </SyntaxHighlighter>
-                  </div>
-                </li>
-                <li>
-                  <strong>Add Transaction Expiry Validation</strong>
-                  <div className="rounded-lg overflow-hidden border border-gray-200 mt-2">
-                    <SyntaxHighlighter language="typescript" style={prism}>
-                      {`// In schemes/exact/stellar/facilitator/verify.ts
-const latestLedger = await server.ledgers().order('desc').limit(1).call();
-if (stellarPayload.validUntilLedger <= latestLedger.records[0].sequence) {
-  return { isValid: false, invalidReason: "payment_expired" };
-}`}
-                    </SyntaxHighlighter>
-                  </div>
-                </li>
-              </ol>
             </div>
           </div>
         </section>
@@ -728,8 +667,8 @@ export default async function DynamicDocsPage({ params }: { params: Promise<{ sl
     if (slugPath === "getting-started") {
       return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-           <h1 className="text-4xl font-bold text-black mb-8">Getting Started</h1>
-           <p>Select a guide from the sidebar to get started.</p>
+           <h1 className="text-4xl font-bold text-black mb-8">{docsContent["getting-started"].title}</h1>
+           {docsContent["getting-started"].content}
         </div>
       )
     }

@@ -13,6 +13,8 @@ const navSections = [
     title: "Welcome to x402",
     items: [
       { name: "Welcome", href: "/docs", external: false },
+      { name: "Pitch Deck", href: "https://www.canva.com/design/DAG6IaZUfdQ/z8O7jielQHfOuASmMPt-qg/view?utm_content=DAG6IaZUfdQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h48fb13a751", external: true },
+      { name: "FAQ", href: "/docs/faq", external: false },
       { name: "x402 Landing Page", href: "/", external: false },
       { name: "Open Source Github Repository", href: "https://github.com/mertkaradayi/stellar-x402", external: true },
     ],
@@ -24,6 +26,12 @@ const navSections = [
     ],
   },
   {
+    title: "PROTOCOL",
+    items: [
+      { name: "Format Comparison", href: "/docs/protocol/comparison", external: false },
+    ],
+  },
+  {
     title: "CORE CONCEPTS",
     items: [
       { name: "x402 Stellar", href: "/docs/core-concepts/x402-stellar", external: false },
@@ -31,6 +39,15 @@ const navSections = [
       { name: "x402 Stellar Fetch", href: "/docs/core-concepts/x402-stellar-fetch", external: false },
       { name: "x402 Stellar Express", href: "/docs/core-concepts/x402-stellar-express", external: false },
       { name: "Facilitator", href: "/docs/core-concepts/facilitator", external: false },
+    ],
+  },
+  {
+    title: "RESOURCES",
+    items: [
+      { name: "x402-stellar", href: "https://www.npmjs.com/package/x402-stellar", external: true },
+      { name: "x402-stellar-client", href: "https://www.npmjs.com/package/x402-stellar-client", external: true },
+      { name: "x402-stellar-express", href: "https://www.npmjs.com/package/x402-stellar-express", external: true },
+      { name: "x402-stellar-fetch", href: "https://www.npmjs.com/package/x402-stellar-fetch", external: true },
     ],
   },
 ]
@@ -143,4 +160,3 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     </div>
   )
 }
-

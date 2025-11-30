@@ -1,16 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ExternalLink, Copy } from "lucide-react"
+import { ExternalLink, Copy, Check, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 const tocItems = [
-  { id: "why-use-x402", title: "Why Use x402?" },
-  { id: "who-is-x402-for", title: "Who is x402 for?" },
-  { id: "what-can-you-build", title: "What Can You Build?" },
-  { id: "how-does-it-work", title: "How Does It Work?" },
+  { id: "what-is-x402", title: "What is x402?" },
+  { id: "stellar-difference", title: "Stellar x402 Difference" },
+  { id: "key-features", title: "Key Features" },
+  { id: "comparison", title: "Comparison" },
+  { id: "network-support", title: "Network Support" },
+  { id: "packages", title: "Packages" },
   { id: "roadmap", title: "Roadmap" },
-  { id: "get-started", title: "Get Started" },
 ]
 
 export default function DocsPage() {
@@ -61,214 +63,250 @@ export default function DocsPage() {
         {/* Title */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-4xl sm:text-5xl font-bold text-black">Welcome to x402</h1>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-black">
-              <Copy className="h-4 w-4" />
-            </Button>
+            <h1 className="text-4xl sm:text-5xl font-bold text-black">Stellar x402 Ecosystem</h1>
+          </div>
+          <div className="space-y-4 text-lg text-gray-600">
+            <blockquote className="border-l-4 border-gray-200 pl-4 italic">
+              Complete Stellar implementation of the x402 payment protocol.
+            </blockquote>
+            <blockquote className="border-l-4 border-gray-200 pl-4 italic">
+              "1 line of code to accept digital dollars on Stellar. No fees, 2-second settlement, $0.001 minimum payment."
+            </blockquote>
+          </div>
+          <div className="flex gap-2 mt-6">
+            <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+            <img src="https://img.shields.io/badge/Node.js-18%2B-green.svg" alt="Node.js" />
           </div>
         </div>
 
-        {/* Introduction */}
-        <div className="prose prose-lg max-w-none mb-12 text-gray-600">
-          <p className="leading-relaxed mb-6">
-            This guide will help you understand x402, the open payment standard, and help you get started building or integrating services with x402.
-          </p>
-          <p className="leading-relaxed mb-6">
-            x402 is the <strong className="text-black">open payment standard</strong> that enables services to charge for access to their APIs and content directly over HTTP. It is built around the{" "}
-            <code className="px-2 py-1 rounded bg-gray-100 text-black font-mono text-sm border border-gray-200">
-              HTTP 402 Payment Required
-            </code>{" "}
-            status code and allows clients to programmatically pay for resources without accounts, sessions, or credential management.
-          </p>
-          <p className="leading-relaxed mb-6">
-            With x402, any web service can require payment before serving a response, using crypto-native payments for speed, privacy, and efficiency.
-          </p>
-        </div>
-
-        {/* Contribution Note */}
-        <div className="mb-12 p-4 rounded-lg border border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-600 mb-2">
-            <strong className="text-black">Want to contribute to our docs?</strong> The{" "}
-            <a href="https://github.com/mertkaradayi/stellar-x402" target="_blank" rel="noopener noreferrer" className="text-black hover:underline inline-flex items-center gap-1">
-              Open Source Github Repository
-              <ExternalLink className="h-3 w-3" />
-            </a>{" "}
-            is open to PRs! Our only ask is that you keep these docs as a neutral resource, with no branded content other than linking out to other resources where appropriate.
-          </p>
-        </div>
-
-        {/* Note about docs */}
-        <div className="mb-12 p-4 rounded-lg border border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-600">
-            <strong className="text-black">Note about the docs:</strong> These docs are the credibly neutral source of truth for x402, as x402 is a completely open standard under the Apache-2.0 license. Coinbase Developer Platform is currently sponsoring{" "}
-            <a href="https://x402.gitbook.io/x402" target="_blank" rel="noopener noreferrer" className="text-black hover:underline inline-flex items-center gap-1">
-              AI-powered docs for users here
-              <ExternalLink className="h-3 w-3" />
-            </a>
-            , as we migrate to our own AI-powered solution on the main x402.org domain.
-          </p>
-        </div>
-
-        {/* Why Use x402 */}
-        <section id="why-use-x402" className="mb-16 scroll-mt-24">
-          <h2 className="text-3xl font-bold text-black mb-6">Why Use x402?</h2>
+        {/* What is x402? */}
+        <section id="what-is-x402" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">What is x402?</h2>
           <p className="text-gray-600 mb-6">
-            x402 addresses key limitations of existing payment systems:
-          </p>
-          <ul className="space-y-3 list-none">
-            <li className="flex items-start gap-3">
-              <span className="text-black mt-1">•</span>
-              <span className="text-gray-600">High fees and friction with traditional credit cards and fiat payment processors</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-black mt-1">•</span>
-              <span className="text-gray-600">Incompatibility with machine-to-machine payments, such as AI agents</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-black mt-1">•</span>
-              <span className="text-gray-600">Lack of support for micropayments, making it difficult to monetize usage-based services</span>
-            </li>
-          </ul>
-        </section>
-
-        {/* Who is x402 for */}
-        <section id="who-is-x402-for" className="mb-16 scroll-mt-24">
-          <h2 className="text-3xl font-bold text-black mb-6">Who is x402 for?</h2>
-          <div className="grid gap-6 md:grid-cols-2 mb-6">
-            <div>
-              <h3 className="font-semibold text-black mb-2">Sellers</h3>
-              <p className="text-sm text-gray-600">
-                Service providers who want to monetize their APIs or content. x402 enables direct, programmatic payments from clients with minimal setup.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-black mb-2">Buyers</h3>
-              <p className="text-sm text-gray-600">
-                Human developers and AI agents seeking to access paid services without accounts or manual payment flows.
-              </p>
-            </div>
-          </div>
-          <p className="text-sm text-gray-600">
-            Both sellers and buyers interact directly through HTTP requests, with payment handled transparently through the protocol.
-          </p>
-        </section>
-
-        {/* What Can You Build */}
-        <section id="what-can-you-build" className="mb-16 scroll-mt-24">
-          <h2 className="text-3xl font-bold text-black mb-6">What Can You Build?</h2>
-          <p className="text-gray-600 mb-6">
-            x402 enables a range of use cases, including:
+            The <a href="https://github.com/coinbase/x402" className="text-blue-600 hover:underline">x402 payment protocol</a> is an open standard for internet-native payments that leverages the existing <code>402 Payment Required</code> HTTP status code. It enables:
           </p>
           <ul className="space-y-3 list-none">
             {[
-              "API services paid per request",
-              "AI agents that autonomously pay for API access",
-              "Paywalls for digital content",
-              "Microservices and tooling monetized via microtransactions",
-              "Proxy services that aggregate and resell API capabilities",
-            ].map((useCase, index) => (
+              { title: "Chain-agnostic payments", desc: "Works across different blockchains" },
+              { title: "Gasless for clients", desc: "Facilitators can sponsor transaction fees" },
+              { title: "Minimal integration", desc: "1 line for servers, 1 function for clients" },
+              { title: "Low minimums", desc: "Support for micropayments ($0.001+)" },
+              { title: "Fast settlement", desc: "2-5 second confirmation times" },
+            ].map((item, index) => (
               <li key={index} className="flex items-start gap-3">
-                <span className="text-black mt-1">•</span>
-                <span className="text-gray-600">{useCase}</span>
+                <div className="mt-1 text-black">•</div>
+                <span className="text-gray-600">
+                  <strong className="text-black">{item.title}</strong> - {item.desc}
+                </span>
               </li>
             ))}
           </ul>
         </section>
 
-        {/* How Does It Work */}
-        <section id="how-does-it-work" className="mb-16 scroll-mt-24">
-          <h2 className="text-3xl font-bold text-black mb-6">How Does It Work?</h2>
-          <p className="text-gray-600 mb-6">
-            At a high level, the flow is simple:
+        {/* What Makes Stellar x402 Different? */}
+        <section id="stellar-difference" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">What Makes Stellar x402 Different?</h2>
+          <p className="text-gray-600 mb-8">
+            This implementation brings x402 to the <strong>Stellar network</strong>, offering unique advantages:
           </p>
-          <ol className="space-y-4 list-decimal list-inside">
-            {[
-              "A buyer requests a resource from a server.",
-              "If payment is required, the server responds with HTTP 402 Payment Required, including payment instructions.",
-              "The buyer prepares and submits a payment payload.",
-              "The server verifies and settles the payment using an x402 facilitator's /verify and /settle endpoints.",
-              "If payment is valid, the server provides the requested resource.",
-            ].map((step, index) => (
-              <li key={index} className="text-gray-600 pl-2">
-                {step}
-              </li>
-            ))}
-          </ol>
+          
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+              <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+                🚀 Ultra-Fast Settlement
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• <strong>2-5 second confirmation</strong> - Near-instant finality</li>
+                <li>• <strong>Ledger-based expiry</strong> - More precise than timestamps</li>
+                <li>• <strong>No gas wars</strong> - Fixed, predictable fees</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+              <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+                💰 True Gasless Payments
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• <strong>Fee sponsorship</strong> - Via fee-bump transactions</li>
+                <li>• <strong>Trust-minimized</strong> - Client signatures preserved</li>
+                <li>• <strong>Flexible</strong> - Works with or without sponsorship</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+              <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+                🔐 Native Stellar Features
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• <strong>XDR format</strong> - Native transaction serialization</li>
+                <li>• <strong>Replay protection</strong> - Protocol-level sequence numbers</li>
+                <li>• <strong>Native XLM</strong> - No token contracts needed</li>
+                <li>• <strong>Soroban ready</strong> - Support for smart contracts</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+              <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+                🌐 Browser-First
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• <strong>Freighter integration</strong> - Seamless signing</li>
+                <li>• <strong>Beautiful UI</strong> - Pre-built paywalls</li>
+                <li>• <strong>No RPC needed</strong> - Client-side simplicity</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Key Features */}
+        <section id="key-features" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">Key Features</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <h3 className="font-bold text-black mb-2">🔒 Security</h3>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>• Trust-minimized architecture</li>
+                <li>• Redis-backed replay protection</li>
+                <li>• Idempotency & caching</li>
+                <li>• Full Zod validation</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-black mb-2">⚡ Performance</h3>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>• 2-5 second settlement</li>
+                <li>• Optional fee sponsorship</li>
+                <li>• Efficient verification</li>
+                <li>• Response buffering</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-black mb-2">🎨 Experience</h3>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>• TypeScript first</li>
+                <li>• Modular packages</li>
+                <li>• Pre-built paywall UI</li>
+                <li>• Comprehensive examples</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-black mb-2">🌍 Ecosystem</h3>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>• Freighter wallet integration</li>
+                <li>• Express middleware</li>
+                <li>• Fetch wrapper</li>
+                <li>• Discovery API</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Comparison */}
+        <section id="comparison" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">Comparison with Other x402 Implementations</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EVM (Coinbase)</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stellar (Ours)</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {[
+                  { feature: "Transaction Format", evm: "Signature-based", stellar: "XDR (signed transaction)" },
+                  { feature: "Fee Sponsorship", evm: "Meta-transactions", stellar: "Fee-bump transactions" },
+                  { feature: "Settlement Time", evm: "~12 seconds", stellar: "2-5 seconds" },
+                  { feature: "Expiry Mechanism", evm: "Timestamp (validBefore)", stellar: "Ledger sequence" },
+                  { feature: "Native Asset", evm: "Requires ERC-20", stellar: "Native XLM" },
+                  { feature: "Replay Protection", evm: "Nonce-based", stellar: "Sequence numbers" },
+                  { feature: "Browser Wallet", evm: "MetaMask", stellar: "Freighter" },
+                ].map((row, idx) => (
+                  <tr key={idx}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{row.feature}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.evm}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-black font-medium">{row.stellar}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Network Support */}
+        <section id="network-support" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">Network Support</h2>
+          <ul className="space-y-3">
+            <li className="flex items-center gap-2 text-gray-600">
+              <Check className="text-green-500 h-5 w-5" />
+              <span><strong>Stellar Testnet</strong> (<code>stellar-testnet</code>)</span>
+            </li>
+            <li className="flex items-center gap-2 text-gray-600">
+              <span className="text-yellow-500">🚧</span>
+              <span><strong>Stellar Mainnet</strong> (<code>stellar-mainnet</code>) - Coming soon</span>
+            </li>
+          </ul>
+        </section>
+
+        {/* Packages */}
+        <section id="packages" className="mb-16 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-black mb-6">Packages</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Use Case</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {[
+                  { name: "x402-stellar", desc: "Core library with types, schemas, and facilitator client", use: "Building custom integrations" },
+                  { name: "x402-stellar-client", desc: "Client SDK for signing payments (Keypair + Freighter)", use: "Client applications" },
+                  { name: "x402-stellar-fetch", desc: "Fetch wrapper that auto-pays 402 responses", use: "Simple client integrations" },
+                  { name: "x402-stellar-express", desc: "Express middleware for protecting routes", use: "Node.js/Express servers" },
+                  { name: "facilitator", desc: "Stellar x402 facilitator server", use: "Payment verification & settlement" },
+                ].map((pkg, idx) => (
+                  <tr key={idx}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 font-mono">{pkg.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{pkg.desc}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{pkg.use}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* Roadmap */}
         <section id="roadmap" className="mb-16 scroll-mt-24">
           <h2 className="text-3xl font-bold text-black mb-6">Roadmap</h2>
-          <p className="text-gray-600 mb-6">
-            x402 is designed as an open standard, and we're excited to build x402 alongside our community. Some items in the roadmap we're excited about include:
+          <p className="text-gray-600 mb-4">
+            See <a href="https://github.com/mertkaradayi/stellar-x402/blob/main/ROADMAP.md" className="text-blue-600 hover:underline">ROADMAP.md</a> for our development plans.
           </p>
-          <ul className="space-y-3 list-none">
-            {[
-              "Solutions guides and templates for proxy servers and tools to make an x402 integration as easy as possible",
-              "`exact` scheme support on Solana (SVM)",
-              "`upto` scheme EVM & SVM",
-              "easier semantics for arbitrary tokens using permit as an alt method to `transferWithAuthorization` (likely via `permit` and an up to scheme)",
-              "Arbitrary token support",
-              "Production-ready marketplace and reputation system for x402-compatible endpoints",
-            ].map((item, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <span className="text-black mt-1">•</span>
-                <span className="text-gray-600">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-gray-600 mt-6">
-            The goal is to make programmatic commerce accessible, permissionless, and developer-friendly.
-          </p>
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+             <h3 className="font-bold text-black mb-2">Upcoming</h3>
+             <ul className="list-disc list-inside text-gray-600 space-y-1">
+               <li>Mainnet support</li>
+               <li>Additional client SDKs</li>
+               <li>More example integrations</li>
+             </ul>
+          </div>
         </section>
 
-        {/* Get Started */}
-        <section id="get-started" className="mb-16 scroll-mt-24">
-          <h2 className="text-3xl font-bold text-black mb-6">Get Started</h2>
-          <p className="text-gray-600 mb-6">
-            Ready to build? Start here:
-          </p>
-          <ul className="space-y-2 list-none mb-6">
-            <li>
-              <a
-                href="/docs/getting-started/sellers"
-                className="text-black hover:underline inline-flex items-center gap-1"
-              >
-                Quickstart for Sellers
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="/docs/getting-started/buyers"
-                className="text-black hover:underline inline-flex items-center gap-1"
-              >
-                Quickstart for Buyers
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="/docs/core-concepts/http-402"
-                className="text-black hover:underline inline-flex items-center gap-1"
-              >
-                Explore Core Concepts
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://discord.gg/x402"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-black hover:underline inline-flex items-center gap-1"
-              >
-                Join our community on Discord
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </li>
-          </ul>
+        {/* Contributing & License */}
+        <section className="mb-16">
+           <h2 className="text-2xl font-bold text-black mb-4">Contributing & License</h2>
+           <p className="text-gray-600 mb-4">
+             Contributions are welcome! This project is open source under the <strong>MIT License</strong>.
+           </p>
+           <p className="text-gray-600">
+             Built with ❤️ for the Stellar ecosystem.
+           </p>
         </section>
+
       </article>
 
       {/* Right Sidebar - On This Page */}
