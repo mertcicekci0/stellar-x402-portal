@@ -39,9 +39,9 @@ export function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
       console.log("Attempting to connect to Freighter...")
       
       // Check if Freighter is installed using the official API
-      const connectionStatus = await isConnected()
+      const isFreighterConnected = await isConnected()
       
-      if (!connectionStatus.isConnected) {
+      if (!isFreighterConnected) {
         console.error("Freighter is not installed")
         alert("Freighter wallet not found. Please install the Freighter browser extension to continue.")
         window.open("https://www.freighter.app/", "_blank")
@@ -51,15 +51,12 @@ export function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
       console.log("Freighter found, requesting access...")
       
       // Request access - this will trigger the Freighter popup
-      const result = await requestAccess()
+      const address = await requestAccess()
       
-      if (result.address) {
-        console.log("Connected with public key:", result.address)
-        setConnectedPublicKey(result.address)
+      if (address) {
+        console.log("Connected with public key:", address)
+        setConnectedPublicKey(address)
         setStep('pay')
-      } else if (result.error) {
-        console.error("Error from Freighter:", result.error)
-        alert("Connection rejected or failed. Please approve the connection in Freighter and try again.")
       }
     } catch (error) {
       console.error("Error connecting to Freighter:", error)
@@ -119,7 +116,7 @@ export function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
       
       // Step 5: Parse the signed transaction
       const signedTransaction = StellarSdk.TransactionBuilder.fromXDR(
-        signedResult.signedTxXdr,
+        signedResult,
         networkDetails.networkPassphrase
       )
       
