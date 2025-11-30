@@ -1,12 +1,10 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import { PaymentDialog } from "@/components/payment-dialog"
 
 export function HeroSection() {
-  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   return (
@@ -55,11 +53,13 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row items-start gap-4 pt-4">
               <Button
                 size="lg"
-                onClick={() => setPaymentDialogOpen(true)}
+                asChild
                 className="bg-black hover:bg-black/90 text-white font-medium px-8 h-12 rounded-none"
               >
-                Try it Out
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <a href="https://stellar-x402-examples-server-example-production.up.railway.app/" target="_blank" rel="noopener noreferrer">
+                  Try it Out
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
               </Button>
               <Button
                 size="lg"
@@ -73,12 +73,6 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-
-      {/* Payment Dialog */}
-      <PaymentDialog
-        isOpen={paymentDialogOpen}
-        onClose={() => setPaymentDialogOpen(false)}
-      />
     </section>
   )
 }

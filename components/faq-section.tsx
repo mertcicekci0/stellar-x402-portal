@@ -238,7 +238,7 @@ export function FAQSection() {
           <h3 className="text-xl font-bold text-black mb-2">Still have questions?</h3>
           <ul className="list-disc pl-4 space-y-1">
             <li>
-              <Link href="https://github.com/mertcicekci0/x402StellarWebsite" className="text-blue-600 hover:underline">
+              <Link href="https://github.com/mertkaradayi/stellar-x402" className="text-blue-600 hover:underline">
                 Open a GitHub Issue
               </Link>
             </li>
