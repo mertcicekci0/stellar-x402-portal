@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { X, Copy, Check, ExternalLink, Wallet, Lock, Unlock, FileText, ArrowRight, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { isConnected, requestAccess, getNetworkDetails, signTransaction } from "@stellar/freighter-api"
+import * as StellarSdk from "@stellar/stellar-sdk"
 
 interface PaymentDialogProps {
   isOpen: boolean
@@ -15,11 +17,16 @@ type PaymentStep = 'connect' | 'pay' | 'processing_payment' | 'unlocked'
 export function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
   const [step, setStep] = useState<PaymentStep>('connect')
   const [copied, setCopied] = useState(false)
+  const [connectedPublicKey, setConnectedPublicKey] = useState<string>("")
+  const [paymentError, setPaymentError] = useState<string>("")
   
-  const walletAddress = "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  // Payment destination from stellarx402integrationdocs.md
+  const PAYMENT_DESTINATION = "GC63PSERYMUUUJKYSSFQ7FKRAU5UPIP3XUC6X7DLMZUB7SSCPW5BSIRT"
+  
+  const walletAddress = connectedPublicKey || "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   const displayAddress = `${walletAddress.slice(0, 8)}...${walletAddress.slice(-8)}`
-  const amount = "0.01"
-  const network = "Stellar"
+  const amount = "1"  // 1 XLM as per x402 protocol
+  const network = "Stellar Testnet"
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(walletAddress)
@@ -27,19 +34,115 @@ export function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleConnect = () => {
-    // Simulate wallet connection
-    setTimeout(() => {
-      setStep('pay')
-    }, 800)
+  const handleConnect = async () => {
+    try {
+      console.log("Attempting to connect to Freighter...")
+      
+      // Check if Freighter is installed using the official API
+      const connectionStatus = await isConnected()
+      
+      if (!connectionStatus.isConnected) {
+        console.error("Freighter is not installed")
+        alert("Freighter wallet not found. Please install the Freighter browser extension to continue.")
+        window.open("https://www.freighter.app/", "_blank")
+        return
+      }
+      
+      console.log("Freighter found, requesting access...")
+      
+      // Request access - this will trigger the Freighter popup
+      const result = await requestAccess()
+      
+      if (result.address) {
+        console.log("Connected with public key:", result.address)
+        setConnectedPublicKey(result.address)
+        setStep('pay')
+      } else if (result.error) {
+        console.error("Error from Freighter:", result.error)
+        alert("Connection rejected or failed. Please approve the connection in Freighter and try again.")
+      }
+    } catch (error) {
+      console.error("Error connecting to Freighter:", error)
+      alert("Connection rejected or failed. Please approve the connection in Freighter and try again.")
+    }
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setStep('processing_payment')
-    // Simulate payment processing
-    setTimeout(() => {
+    setPaymentError("")
+    
+    try {
+      console.log("Starting x402 payment process...")
+      
+      // Step 1: Get network details from Freighter
+      const networkDetails = await getNetworkDetails()
+      console.log("Network details:", networkDetails)
+      
+      // Determine if we're on testnet or mainnet
+      const isTestnet = networkDetails.network === "TESTNET" || networkDetails.networkPassphrase.includes("Test")
+      const server = new StellarSdk.Horizon.Server(
+        isTestnet 
+          ? "https://horizon-testnet.stellar.org"
+          : "https://horizon.stellar.org"
+      )
+      
+      console.log("Loading source account...")
+      // Step 2: Load the source account
+      const sourceAccount = await server.loadAccount(connectedPublicKey)
+      
+      console.log("Building x402 payment transaction...")
+      // Step 3: Build the payment transaction (x402 protocol)
+      // This follows the x402 specification: XDR transaction format with native XLM
+      const transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: networkDetails.networkPassphrase,
+      })
+        .addOperation(
+          StellarSdk.Operation.payment({
+            destination: PAYMENT_DESTINATION,
+            asset: StellarSdk.Asset.native(), // Native XLM as per x402-stellar
+            amount: amount,
+          })
+        )
+        .setTimeout(180) // 3 minutes timeout
+        .build()
+      
+      console.log("Requesting signature from Freighter (x402 flow)...")
+      
+      // Step 4: Sign with Freighter - this implements the x402 browser flow
+      // As per stellarx402integrationdocs.md: "Freighter will prompt user to approve payment"
+      const signedResult = await signTransaction(transaction.toXDR(), {
+        networkPassphrase: networkDetails.networkPassphrase,
+      })
+      
+      console.log("Transaction signed, submitting to Stellar network...")
+      
+      // Step 5: Parse the signed transaction
+      const signedTransaction = StellarSdk.TransactionBuilder.fromXDR(
+        signedResult.signedTxXdr,
+        networkDetails.networkPassphrase
+      )
+      
+      // Step 6: Submit to Stellar network (x402 settlement)
+      // This is the "Submit to Stellar" step in the x402 architecture
+      const result = await server.submitTransaction(signedTransaction as StellarSdk.Transaction)
+      
+      console.log("x402 payment successful!", result)
+      console.log("Transaction hash:", result.hash)
+      
+      // Step 7: Payment successful - unlock content (x402 protocol complete)
       setStep('unlocked')
-    }, 2000)
+      
+    } catch (error) {
+      console.error("x402 payment error:", error)
+      setPaymentError(error instanceof Error ? error.message : "Payment failed")
+      
+      // Show error alert
+      alert(`Payment failed: ${error instanceof Error ? error.message : "Unknown error"}. Please try again.`)
+      
+      // Go back to payment step
+      setStep('pay')
+    }
   }
 
   const handleAccess = () => {
