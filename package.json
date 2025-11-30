@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
-    "@radix-ui/react-accordion": "1.2.2",
+    "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
     "@radix-ui/react-avatar": "1.1.2",
@@ -61,6 +61,9 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
+    "x402-stellar-client": "^0.1.0",
+    "x402-stellar-express": "^0.1.0",
+    "x402-stellar-fetch": "^0.1.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
