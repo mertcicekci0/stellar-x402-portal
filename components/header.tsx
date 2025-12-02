@@ -49,15 +49,33 @@ export function Header() {
           </nav>
 
           {/* Right side - GitHub */}
-          <div className="hidden md:flex items-center">
-            <Link
-              href="https://github.com/mertkaradayi/stellar-x402"
-              target="_blank"
-              className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition-colors group"
-            >
+          <div className="hidden md:flex items-center relative group">
+            <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition-colors">
               <Github className="w-5 h-5 transition-transform group-hover:scale-110" />
               <span>GitHub</span>
-            </Link>
+            </button>
+            
+            {/* GitHub Dropdown */}
+            <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-black/5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+              <div className="p-1">
+                <Link
+                  href="https://github.com/mertkaradayi/stellar-x402"
+                  target="_blank"
+                  className="flex flex-col px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors text-left"
+                >
+                  <span className="text-sm font-medium text-black">x402 Protocol</span>
+                  <span className="text-xs text-gray-500">Core protocol & SDKs</span>
+                </Link>
+                <Link
+                  href="https://github.com/mertcicekci0/stellar-x402-portal"
+                  target="_blank"
+                  className="flex flex-col px-4 py-2.5 rounded-lg hover:bg-black/5 transition-colors text-left"
+                >
+                  <span className="text-sm font-medium text-black">x402 Portal</span>
+                  <span className="text-xs text-gray-500">Website source code</span>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -88,14 +106,28 @@ export function Header() {
                 {link.name}
               </Link>
             ))}
-            <div className="pt-3 border-t border-black/5 mt-2">
+            <div className="pt-3 border-t border-black/5 mt-2 space-y-1">
               <Link
                 href="https://github.com/mertkaradayi/stellar-x402"
                 target="_blank"
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:text-black hover:bg-black/5 rounded-xl transition-colors"
               >
                 <Github className="w-5 h-5" />
-                GitHub Repository
+                <div>
+                  <span className="block">x402 Protocol</span>
+                  <span className="text-xs text-gray-400 font-normal">Core protocol & SDKs</span>
+                </div>
+              </Link>
+              <Link
+                href="https://github.com/mertcicekci0/stellar-x402-portal"
+                target="_blank"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:text-black hover:bg-black/5 rounded-xl transition-colors"
+              >
+                <Github className="w-5 h-5" />
+                <div>
+                  <span className="block">x402 Portal</span>
+                  <span className="text-xs text-gray-400 font-normal">Website source code</span>
+                </div>
               </Link>
             </div>
           </div>
