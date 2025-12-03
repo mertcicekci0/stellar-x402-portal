@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
@@ -74,7 +75,7 @@ export function HeroSection() {
                 className="border-black/20 text-black hover:bg-black/5 px-8 h-12 rounded-none bg-transparent"
                 asChild
               >
-                <a href="#use-cases">View Ecosystem</a>
+                <Link href="/ecosystem">View Ecosystem</Link>
               </Button>
             </div>
           </div>
